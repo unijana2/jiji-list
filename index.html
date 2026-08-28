@@ -295,6 +295,12 @@
     background:transparent; border:none; border-radius:10px; padding:9px 10px; cursor:pointer;
     color:var(--list-ink); transition: background .15s ease;
   }
+  .art{
+    flex:none; width:34px; height:34px; border-radius:var(--radius-sm); background:var(--bg-2);
+    overflow:hidden; display:flex; align-items:center; justify-content:center;
+  }
+  .art img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .art.is-empty::after{ content:"♪"; color:var(--list-ink-soft); font-size:.85rem; }
   .track-row:hover{ background:var(--list-row); }
   .track-row.is-active{ background:var(--accent); }
   .track-row.is-active .track-title, .track-row.is-active .track-artist, .track-row.is-active .track-index{ color:var(--screen-bg); }
@@ -607,6 +613,7 @@
       var a = escapeHtml(list[k][1]);
       var active = idx === selectedIndex ? " is-active" : "";
       html += '<div class="track-row' + active + '" role="option" tabindex="0" aria-selected="' + (idx===selectedIndex) + '" data-index="' + idx + '">' +
+        '<span class="art is-empty" data-idx="' + idx + '" aria-hidden="true"></span>' +
         '<span class="track-index">' + String(idx+1).padStart(3,"0") + '</span>' +
         '<span class="track-meta"><span class="track-title">' + t + '</span><span class="track-artist">' + a + '</span></span>' +
         '<a class="row-play" href="' + spotifyUrl(idx) + '" target="_blank" rel="noopener" aria-label="Play on Spotify" title="Play on Spotify">▶</a>' +
@@ -633,6 +640,74 @@
       html += renderRows(filtered);
     }
     trackListEl.innerHTML = html;
+    observeArt();
+  }
+
+  /* ---------- album art (best-effort, via iTunes' public search API) ---------- */
+  var ART_CONCURRENCY = 4;
+  var artActiveCount = 0;
+  var artQueue = [];
+
+  function artCacheGet(key){
+    try{ return window.localStorage.getItem("jiji-art:" + key); }catch(e){ return null; }
+  }
+  function artCacheSet(key, val){
+    try{ window.localStorage.setItem("jiji-art:" + key, val); }catch(e){}
+  }
+  function setArt(el, url){
+    var img = document.createElement("img");
+    img.src = url; img.alt = ""; img.loading = "lazy";
+    el.appendChild(img);
+    el.classList.remove("is-empty");
+  }
+  function loadArt(el, idx){
+    var song = SONGS[idx];
+    if(!song) return Promise.resolve();
+    var key = (song[0] + "|" + song[1]).toLowerCase();
+    var cached = artCacheGet(key);
+    if(cached){
+      if(cached !== "none") setArt(el, cached);
+      return Promise.resolve();
+    }
+    var q = encodeURIComponent(song[0] + " " + song[1]);
+    return fetch("https://itunes.apple.com/search?term=" + q + "&media=music&entity=song&limit=1")
+      .then(function(res){ return res.json(); })
+      .then(function(data){
+        var r = data && data.results && data.results[0];
+        var url = r && (r.artworkUrl100 || r.artworkUrl60);
+        if(url){
+          url = url.replace("100x100bb","300x300bb");
+          artCacheSet(key, url);
+          setArt(el, url);
+        } else {
+          artCacheSet(key, "none");
+        }
+      })
+      .catch(function(){ /* blocked or offline — leave the placeholder note icon */ });
+  }
+  function pumpArt(){
+    while(artActiveCount < ART_CONCURRENCY && artQueue.length){
+      var job = artQueue.shift();
+      artActiveCount++;
+      loadArt(job.el, job.idx).then(function(){ artActiveCount--; pumpArt(); });
+    }
+  }
+  function queueArt(el, idx){
+    artQueue.push({ el: el, idx: idx });
+    pumpArt();
+  }
+  var artObserver = ("IntersectionObserver" in window) ? new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        artObserver.unobserve(entry.target);
+        queueArt(entry.target, parseInt(entry.target.getAttribute("data-idx"),10));
+      }
+    });
+  }, { rootMargin: "200px" }) : null;
+  function observeArt(){
+    if(!artObserver) return;
+    var arts = trackListEl.querySelectorAll(".art[data-idx]");
+    arts.forEach(function(el){ artObserver.observe(el); });
   }
 
   function updateNowPlaying(){
