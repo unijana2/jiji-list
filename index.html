@@ -232,6 +232,26 @@
   .tonearm::after{ content:""; position:absolute; bottom:-4px; left:-6px; width:18px; height:10px; background:var(--accent); border-radius:2px; }
   .vinyl-np{ font-family:var(--font-c); font-style:italic; font-size:1.05rem; color:var(--ink); text-align:center; max-width:280px; }
 
+  /* ---------- spotify hook ---------- */
+  .play-row{ display:flex; justify-content:center; margin:0 0 22px; }
+  .spotify-btn{
+    display:inline-flex; align-items:center; gap:9px; text-decoration:none;
+    background:var(--accent); color:var(--screen-bg); font-family:var(--font-b); font-weight:700;
+    padding:12px 24px; border-radius:999px; font-size:.88rem; transition:transform .15s ease;
+  }
+  html[data-mode="ipod"] .spotify-btn{ color:#fff; }
+  .spotify-btn:hover{ transform:translateY(-1px); }
+  .spotify-btn .ico{ font-size:.8em; }
+  .row-play{
+    flex:none; display:flex; align-items:center; justify-content:center;
+    width:28px; height:28px; border-radius:50%; background:var(--bg-2); color:var(--accent);
+    text-decoration:none; font-size:.7rem; margin-inline-start:auto; opacity:0; transition:opacity .15s ease, background .15s ease;
+  }
+  .track-row:hover .row-play, .track-row:focus-within .row-play{ opacity:1; }
+  .row-play:hover{ background:var(--accent); color:var(--screen-bg); }
+  html[data-mode="ipod"] .row-play:hover{ color:#fff; }
+  .track-row.is-active .row-play{ opacity:1; }
+
   /* ---------- motion ---------- */
   @media (prefers-reduced-motion: no-preference){
     .onair-dot{ animation: blink 2.4s ease-in-out infinite; }
@@ -391,6 +411,12 @@
         <div class="now-playing-text vinyl-np" data-now-playing>—</div>
       </div>
     </div>
+  </div>
+
+  <div class="play-row">
+    <a class="spotify-btn" id="spotifyBtn" href="#" target="_blank" rel="noopener">
+      <span class="ico">▶</span><span id="spotifyBtnLabel">Play on Spotify</span>
+    </a>
   </div>
 
   <div class="track-panel">
@@ -565,6 +591,11 @@
     });
   }
 
+  function spotifyUrl(i){
+    var song = SONGS[i];
+    return "https://open.spotify.com/search/" + encodeURIComponent(song[0] + " " + song[1]);
+  }
+
   function renderRows(list){
     if(list.length === 0){
       return '<p class="no-results">ما لقينا أغنية بهالاسم…</p>';
@@ -575,10 +606,11 @@
       var t = escapeHtml(list[k][0]);
       var a = escapeHtml(list[k][1]);
       var active = idx === selectedIndex ? " is-active" : "";
-      html += '<button type="button" class="track-row' + active + '" role="option" aria-selected="' + (idx===selectedIndex) + '" data-index="' + idx + '">' +
+      html += '<div class="track-row' + active + '" role="option" tabindex="0" aria-selected="' + (idx===selectedIndex) + '" data-index="' + idx + '">' +
         '<span class="track-index">' + String(idx+1).padStart(3,"0") + '</span>' +
         '<span class="track-meta"><span class="track-title">' + t + '</span><span class="track-artist">' + a + '</span></span>' +
-        '</button>';
+        '<a class="row-play" href="' + spotifyUrl(idx) + '" target="_blank" rel="noopener" aria-label="Play on Spotify" title="Play on Spotify">▶</a>' +
+        '</div>';
     }
     return html;
   }
@@ -620,6 +652,13 @@
 
     var count = (selectedIndex * 37) % 999;
     tapeCounter.textContent = String(count).padStart(3,"0");
+
+    var spotifyBtn = document.getElementById("spotifyBtn");
+    var spotifyBtnLabel = document.getElementById("spotifyBtnLabel");
+    if(spotifyBtn){
+      spotifyBtn.href = spotifyUrl(selectedIndex);
+      spotifyBtnLabel.textContent = "Play \"" + title + "\" on Spotify";
+    }
   }
 
   function markActiveRows(){
@@ -666,8 +705,17 @@
   });
 
   trackListEl.addEventListener("click", function(e){
+    if(e.target.closest(".row-play")) return;
     var row = e.target.closest(".track-row");
     if(!row) return;
+    selectSong(parseInt(row.getAttribute("data-index"),10));
+  });
+
+  trackListEl.addEventListener("keydown", function(e){
+    if(e.key !== "Enter" && e.key !== " ") return;
+    var row = e.target.closest(".track-row");
+    if(!row) return;
+    e.preventDefault();
     selectSong(parseInt(row.getAttribute("data-index"),10));
   });
 
@@ -682,12 +730,15 @@
       if(action === "prev"){ selectSong(selectedIndex - 1, { scroll:true }); }
       else if(action === "next"){ selectSong(selectedIndex + 1, { scroll:true }); }
       else if(action === "menu"){ filterInput.value = ""; renderList(); markActiveRows(); trackListEl.scrollTop = 0; }
-      else if(action === "select" || action === "play"){
+      else if(action === "select"){
         centerBtn.classList.remove("pulse");
         void centerBtn.offsetWidth;
         centerBtn.classList.add("pulse");
         var row = trackListEl.querySelector('.track-row[data-index="' + selectedIndex + '"]');
         if(row){ row.scrollIntoView({ block:"nearest" }); }
+      }
+      else if(action === "play"){
+        window.open(spotifyUrl(selectedIndex), "_blank", "noopener");
       }
     });
   });
