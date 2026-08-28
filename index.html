@@ -328,7 +328,7 @@
 <div class="page">
   <p class="eyebrow">One playlist, four machines</p>
   <h1 class="title">JIJI List</h1>
-  <p class="kicker"><bdi>١٠٣ أغنية وحدة… تسمعينها راديو، آيبود، كاسيت، أو أسطوانة — اختاري الجهاز وشوفي القائمة تتلبّس شكل ثاني.</bdi></p>
+  <p class="kicker"><bdi><span id="totalKicker">10</span> أغنية وحدة… تسمعينها راديو، آيبود، كاسيت، أو أسطوانة — اختاري الجهاز وشوفي القائمة تتلبّس شكل ثاني.</bdi></p>
 
   <div class="switcher" role="group" aria-label="Choose player mode">
     <button type="button" class="mode-btn" data-mode-btn="radio" aria-pressed="false"><span class="ico">📻</span>Radio</button>
@@ -433,116 +433,23 @@
     <div class="track-list" id="trackList" role="listbox" aria-label="JIJI list tracks"></div>
   </div>
 
-  <footer class="foot">JIJI list — 103 tracks, one playlist, four machines.</footer>
+  <footer class="foot">JIJI list — <span id="totalFooter">10</span> tracks, one playlist, four machines.</footer>
 </div>
 
 <script>
 (function(){
   "use strict";
   var SONGS = [
-    ["Run Rabbit","Mollie Elizabeth"],
-    ["Bimbo Doll (Slowed)","Zak Conner, hornja"],
-    ["El Muchacho de los Ojos Tristes","Jeanette"],
-    ["あなぐらぐらし","Kikuo"],
-    ["DANCE... (Edit)","Slayyyter"],
-    ["Impostor Syndrome","Sidney Gish"],
-    ["Hate Yourself","TV Girl"],
-    ["Genie In a Bottle","Christina Aguilera"],
-    ["Sad Girlz Luv Money (TV Mix)","Party Tyme"],
-    ["Tongue","GFOTY"],
-    ["Tongue (Lil Data Remix)","Lil Data, GFOTY"],
-    ["LEVEL 96!","DAMAGE, TOKYOSLEEP, RZXT!"],
-    ["Ride Or Die, Pt. 2","Tokischa, Villano Antillano, Sevdaliza"],
-    ["Cosmic","Talal"],
-    ["Wondrous Place","Drug Store Romeos"],
-    ["MUEVETE Y PERREA","leonardo alta gama"],
-    ["Laisse tomber les filles","Fabienne DelSol"],
-    ["Two Of Hearts","Stacey Q"],
-    ["The One Who's Running the Show","Gooseworx"],
-    ["Hung Up","Madonna"],
-    ["MY JEALOUSY HARDTEKK (Super Slowed)","ovg!"],
-    ["Dead Women","Mitski"],
-    ["Einfach so","Giulia Becker, Mine"],
-    ["Talk Talk (feat. Troye Sivan)","Troye Sivan, Charli XCX"],
-    ["ice (Slowed)","ZERTAL"],
-    ["Loser, Baby (60's Version)","Matt Dusk"],
-    ["La Isla Bonita","Madonna"],
-    ["Your Slut","Mika Montag, BJ Lips"],
-    ["Sorry","Justin Bieber"],
-    ["MONTAGEM GRITOS TALENTO","DJ FZ DA, DJ FRIZER, prodbydxm"],
-    ["gun show","lil hero"],
-    ["RUN!","Lay Bankz, Odetari, VALORANT"],
-    ["radar","lil hero"],
-    ["Habits (feat. Pastel Ghost)","Mr.Kitty"],
-    ["Day By Day","Wesley Preis, Helluva Boss"],
-    ["Klown Bitch","Allison Kaplan, Faye Mata, Helluva Boss"],
-    ["Over You","Cristina Vee, Helluva Boss"],
-    ["Cybergirl","Lilithzplug"],
-    ["MI MAMI FUNK, Vol. 2 (Ultra Slow)","DJ-JY12, RD12, DJ DYLANFK"],
-    ["Mia and Sebastian's Theme (La La Land)","Alexandre Tharaud, Justin Hurwitz"],
-    ["Vacay To Bonetown","Cristina Vee, Helluva Boss"],
-    ["ketamine","siouxxie sixxsta"],
-    ["Rainbow","Sia"],
-    ["MONTAGEM VOZES TALENTINHO","Mc Luizinho, DJ JUAN, heapper"],
-    ["No Sleep","Almaaz"],
-    ["Location (Original Mix)","Diego Power"],
-    ["Shinigami Eyes","Grimes"],
-    ["Esmany","Saham"],
-    ["Be My First One (Acoustic Version)","TalkinToys"],
-    ["BLUE","Billie Eilish"],
-    ["Into the Desert","Toxic Wolf"],
-    ["VIOLENTO","Kobe Mane"],
-    ["Pitbull Terrier","Die Antwoord"],
-    ["Love Me Back (Fayahh Beat)","Robinson, Trinidad Cardona"],
-    ["Happy Hour","The Internet"],
-    ["matrix (bl studio loop)","chrmbchrmb"],
-    ["Apple","Charli xcx"],
-    ["ketamina","KUČKA, yaego"],
-    ["Kiss Me Again (HardTekk Ultra Slowed)","Zak Conner"],
-    ["Fietspomp","Klaus Veen"],
-    ["U Weren't Here I Really Miss You","Mia Martina, Cult Member"],
-    ["Les","Childish Gambino"],
-    ["Something Stupid (From \"Better Call Saul\")","Lola Marsh"],
-    ["Starstruck","Lady Gaga, Space Cowboy, Flo Rida"],
-    ["Radio","Bershy"],
-    ["WET DREAMS (Slowed & Reverb)","Nimstarr, Odetari, ODECORE"],
-    ["Losin' Streak","Sam Haft, Blake Roman, Hazbin Hotel"],
-    ["How Deep Is Your Love","Disciples, Calvin Harris"],
-    ["Under Your Spell (Slowed + Reverb)","Sapphink, 13Aurora"],
-    ["La petite fille de la mer (Remastered)","Vangelis"],
-    ["She Wolf","Shakira"],
-    ["You Right","The Weeknd, Doja Cat"],
-    ["mazza","$NOT, Jack Brodie, HIGH RELIGION"],
-    ["Mais Não Pode Babar","MENOR K"],
-    ["Maliket El Ehsas","إليسا"],
-    ["Rush (feat. PinkPantheress & Hyunjin)","Hyunjin, PinkPantheress, Troye Sivan"],
-    ["PELEAMOS","VAINY, Fauna Music, elaggume"],
-    ["Kryptonite (feat. Julia Temos)","Julia Temos, Jyye"],
-    ["Thank You (feat. RAYE)","RAYE, PVRIS"],
-    ["Fame is a Gun","Addison Rae"],
-    ["Better without you","K0RE, ChammyVal, Chris Honor"],
-    ["Drunk Groove (Edit)","Boosin, MARUV"],
-    ["Siren","SUNMI"],
-    ["Imitadora","Romeo Santos"],
-    ["Little Bit (Autoerotique Remix)","Autoerotique, Lykke Li"],
-    ["Revolving door","Tate McRae"],
-    ["i love u. (slowed + reverb)","wiv"],
-    ["static","ghostmasheen"],
-    ["Golden Brown","The Stranglers"],
-    ["Am I Dreaming","Roisee, A$AP Rocky, Metro Boomin"],
-    ["Anthems For A Seventeen Year-Old","yeule"],
-    ["Slut Pop","Kim Petras"],
-    ["DARE","Gorillaz"],
-    ["Nope your too late i already died","i wanna be a jack-o-lantern, wifiskeleton"],
-    ["Ojos Tristes (with The Marías)","The Marías, benny blanco, Selena Gomez"],
-    ["Anthems For A Seventeen Year-Old (Cover)","Broken Social Scene"],
-    ["ON DAT BXTCH! (Super Slowed)","velours"],
-    ["boys beware","Mad Tsai"],
-    ["Die Your Daughter","Susannah Joffe"],
-    ["A New Kind Of Love (Demo)","Guy Sigsworth, Imogen Heap, Frou Frou"],
-    ["Love Of Your Life","RAYE"],
-    ["Borderline","Tame Impala"],
-    ["Carousel","Melanie Martinez"]
+    ["petal","Ariana Grande"],
+    ["the boy is mine","Ariana Grande"],
+    ["Boys Don't Cry","The Cure"],
+    ["The Boy Is Mine","Brandy, Monica"],
+    ["Circus","Britney Spears"],
+    ["Vanished","Crystal Castles"],
+    ["Jealous Type","Doja Cat"],
+    ["Kiss Me More (feat. SZA)","Doja Cat, SZA"],
+    ["Feel Good Inc.","Gorillaz"],
+    ["Go Away","Unknown Artist"]
   ];
 
   var PLACEHOLDERS = {
@@ -818,7 +725,13 @@
     });
   });
 
+  var totalKicker = document.getElementById("totalKicker");
+  var totalFooter = document.getElementById("totalFooter");
+  if(totalKicker) totalKicker.textContent = SONGS.length;
+  if(totalFooter) totalFooter.textContent = SONGS.length;
+
   loadState();
+  if(selectedIndex >= SONGS.length) selectedIndex = 0;
   setMode(currentMode);
   selectSong(selectedIndex);
 })();
