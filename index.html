@@ -233,7 +233,15 @@
   .vinyl-np{ font-family:var(--font-c); font-style:italic; font-size:1.05rem; color:var(--ink); text-align:center; max-width:280px; }
 
   /* ---------- spotify hook ---------- */
-  .play-row{ display:flex; justify-content:center; margin:0 0 22px; }
+  .play-row{ display:flex; flex-direction:column; align-items:center; gap:14px; margin:0 0 22px; }
+  .np-embed-card{
+    width:100%; background:var(--list-bg); border:1px solid var(--line); border-radius:var(--radius-sm);
+    padding:8px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+  }
+  .spotify-frame{ display:block; width:100%; border-radius:12px; }
+  .np-embed-fallback{
+    margin:6px 4px 2px; font-size:.82rem; color:var(--list-ink-soft); text-align:center; line-height:1.6;
+  }
   .spotify-btn{
     display:inline-flex; align-items:center; gap:9px; text-decoration:none;
     background:var(--accent); color:var(--screen-bg); font-family:var(--font-b); font-weight:700;
@@ -420,8 +428,12 @@
   </div>
 
   <div class="play-row">
+    <div class="np-embed-card" id="npEmbedCard">
+      <iframe id="spotifyFrame" class="spotify-frame" title="Spotify player" src="" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" hidden></iframe>
+      <p class="np-embed-fallback" id="npEmbedFallback" hidden>ما لقينا نسخة سبوتيفاي رسمية أقدر أشغّلها هنا داخل الصفحة لهالأغنية — افتحيها من سبوتيفاي مباشرة 👇</p>
+    </div>
     <a class="spotify-btn" id="spotifyBtn" href="#" target="_blank" rel="noopener">
-      <span class="ico">▶</span><span id="spotifyBtnLabel">Play on Spotify</span>
+      <span class="ico">↗</span><span id="spotifyBtnLabel">Open in Spotify</span>
     </a>
   </div>
 
@@ -440,16 +452,16 @@
 (function(){
   "use strict";
   var SONGS = [
-    ["petal","Ariana Grande"],
-    ["the boy is mine","Ariana Grande"],
-    ["Boys Don't Cry","The Cure"],
-    ["The Boy Is Mine","Brandy, Monica"],
-    ["Circus","Britney Spears"],
-    ["Vanished","Crystal Castles"],
-    ["Jealous Type","Doja Cat"],
-    ["Kiss Me More (feat. SZA)","Doja Cat, SZA"],
-    ["Feel Good Inc.","Gorillaz"],
-    ["Go Away","Unknown Artist"]
+    ["petal","Ariana Grande","70pVCVMGjmIWPbWXDwf11e"],
+    ["the boy is mine","Ariana Grande","0Lmbke3KNVFXtoH2mMSHCw"],
+    ["Boys Don't Cry","The Cure","1QFh8OH1e78dGd3VyJZCAC"],
+    ["The Boy Is Mine","Brandy, Monica","6sHsXIJoEN5JpdkGMQDJxt"],
+    ["Circus","Britney Spears","7jk7gqyEonmVVYahZN5zhW"],
+    ["Vanished","Crystal Castles","4bQ7mjty0UVlKRalhizpGT"],
+    ["Jealous Type","Doja Cat","1IfGOnXoMBkiKC9xljlSfa"],
+    ["Kiss Me More (feat. SZA)","Doja Cat, SZA","3DarAbFujv6eYNliUTyqtz"],
+    ["Feel Good Inc.","Gorillaz","0d28khcov6AiegSCpG5TuT"],
+    ["Go Away","Unknown Artist",null]
   ];
 
   var PLACEHOLDERS = {
@@ -504,9 +516,17 @@
     });
   }
 
-  function spotifyUrl(i){
+  function spotifySearchUrl(i){
     var song = SONGS[i];
     return "https://open.spotify.com/search/" + encodeURIComponent(song[0] + " " + song[1]);
+  }
+  function spotifyTrackUrl(i){
+    var song = SONGS[i];
+    return song[2] ? "https://open.spotify.com/track/" + song[2] : spotifySearchUrl(i);
+  }
+  function spotifyEmbedUrl(i){
+    var song = SONGS[i];
+    return song[2] ? "https://open.spotify.com/embed/track/" + song[2] + "?utm_source=generator&theme=0" : null;
   }
 
   function renderRows(list){
@@ -523,7 +543,7 @@
         '<span class="art is-empty" data-idx="' + idx + '" aria-hidden="true"></span>' +
         '<span class="track-index">' + String(idx+1).padStart(3,"0") + '</span>' +
         '<span class="track-meta"><span class="track-title">' + t + '</span><span class="track-artist">' + a + '</span></span>' +
-        '<a class="row-play" href="' + spotifyUrl(idx) + '" target="_blank" rel="noopener" aria-label="Play on Spotify" title="Play on Spotify">▶</a>' +
+        '<a class="row-play" href="' + spotifyTrackUrl(idx) + '" target="_blank" rel="noopener" aria-label="Open on Spotify" title="Open on Spotify">▶</a>' +
         '</div>';
     }
     return html;
@@ -638,8 +658,27 @@
     var spotifyBtn = document.getElementById("spotifyBtn");
     var spotifyBtnLabel = document.getElementById("spotifyBtnLabel");
     if(spotifyBtn){
-      spotifyBtn.href = spotifyUrl(selectedIndex);
-      spotifyBtnLabel.textContent = "Play \"" + title + "\" on Spotify";
+      spotifyBtn.href = spotifyTrackUrl(selectedIndex);
+      spotifyBtnLabel.textContent = "Open \"" + title + "\" in Spotify";
+    }
+
+    var frame = document.getElementById("spotifyFrame");
+    var fallback = document.getElementById("npEmbedFallback");
+    var embedUrl = spotifyEmbedUrl(selectedIndex);
+    if(frame){
+      if(embedUrl){
+        if(frame.getAttribute("data-src") !== embedUrl){
+          frame.src = embedUrl;
+          frame.setAttribute("data-src", embedUrl);
+        }
+        frame.hidden = false;
+        if(fallback) fallback.hidden = true;
+      } else {
+        frame.hidden = true;
+        frame.removeAttribute("src");
+        frame.removeAttribute("data-src");
+        if(fallback) fallback.hidden = false;
+      }
     }
   }
 
@@ -720,7 +759,7 @@
         if(row){ row.scrollIntoView({ block:"nearest" }); }
       }
       else if(action === "play"){
-        window.open(spotifyUrl(selectedIndex), "_blank", "noopener");
+        window.open(spotifyTrackUrl(selectedIndex), "_blank", "noopener");
       }
     });
   });
