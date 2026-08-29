@@ -326,6 +326,9 @@
   .track-list::-webkit-scrollbar-thumb{ background:var(--line); border-radius:8px; }
 
   footer.foot{ text-align:center; color:var(--ink-soft); font-size:.75rem; margin-top:30px; letter-spacing:.03em; }
+  footer.foot p{ margin:0 0 6px; }
+  footer.foot p:last-child{ margin-bottom:0; }
+  footer.foot .credits{ font-size:.68rem; opacity:.75; max-width:52ch; margin-inline:auto; line-height:1.6; }
 
   @media (max-width:520px){
     .clickwheel{ width:180px; height:180px; }
@@ -445,7 +448,10 @@
     <div class="track-list" id="trackList" role="listbox" aria-label="JIJI list tracks"></div>
   </div>
 
-  <footer class="foot">JIJI list — <span id="totalFooter">10</span> tracks, one playlist, four machines.</footer>
+  <footer class="foot">
+    <p>JIJI list — <span id="totalFooter">10</span> tracks, one playlist, four machines.</p>
+    <p class="credits">🎧 التشغيل عبر مشغّل سبوتيفاي الرسمي مباشرة من سيرفراتهم، وكل الحقوق الموسيقية محفوظة لأصحابها الأصليين وشركات الإنتاج الموزّعة عبر سبوتيفاي.</p>
+  </footer>
 </div>
 
 <script>
