@@ -46,6 +46,16 @@
     --font-c:'Fraunces',Georgia,serif;
     --radius-lg:16px; --radius-sm:6px;
   }
+  html[data-mode="car"]{
+    --bg:#f3ecfc; --bg-2:#e8dcf7; --housing:#cdb0e9; --housing-2:#a97fd1;
+    --face:#150c26; --screen-bg:#150c26; --ink:#3d2a5c; --ink-soft:#7a5fa0;
+    --list-ink:#3d2a5c; --list-ink-soft:#8a72ad; --list-bg:#f6f1fd; --list-row:#ffffff;
+    --accent:#8b5cf6; --led:#c9a6ff; --line:#d8caf0;
+    --font-a:'Archivo Expanded',Arial,sans-serif;
+    --font-b:'Hanken Grotesk',system-ui,sans-serif;
+    --font-c:'Sixtyfour','Courier New',monospace;
+    --radius-lg:20px; --radius-sm:10px;
+  }
 
   *,*::before,*::after{ box-sizing:border-box; }
   html{ color-scheme: dark light; }
@@ -113,7 +123,8 @@
   html[data-mode="radio"] .device-visual[data-for="radio"],
   html[data-mode="ipod"] .device-visual[data-for="ipod"],
   html[data-mode="cassette"] .device-visual[data-for="cassette"],
-  html[data-mode="vinyl"] .device-visual[data-for="vinyl"]{ display:block; }
+  html[data-mode="vinyl"] .device-visual[data-for="vinyl"],
+  html[data-mode="car"] .device-visual[data-for="car"]{ display:block; }
 
   .now-playing-text{
     font-family:var(--font-c); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
@@ -232,6 +243,67 @@
   .tonearm::after{ content:""; position:absolute; bottom:-4px; left:-6px; width:18px; height:10px; background:var(--accent); border-radius:2px; }
   .vinyl-np{ font-family:var(--font-c); font-style:italic; font-size:1.05rem; color:var(--ink); text-align:center; max-width:280px; }
 
+  /* ===== CAR STEREO ===== */
+  .car-body{ display:flex; flex-direction:column; gap:16px; }
+  .car-top{ display:flex; align-items:stretch; gap:12px; flex-wrap:wrap; }
+  .car-side{ display:flex; flex-direction:column; gap:7px; justify-content:center; flex:none; }
+  .car-side-btn{
+    background:var(--housing-2); color:var(--ink); border:none; border-radius:999px;
+    padding:7px 13px; font-family:var(--font-b); font-weight:700; font-size:.68rem; letter-spacing:.03em;
+    text-align:center; line-height:1.25; user-select:none;
+  }
+  .car-side-btn .sub{ display:block; font-size:.58rem; font-weight:600; opacity:.7; }
+  .car-knob-wrap{ display:flex; align-items:center; justify-content:center; flex:none; padding:0 4px; }
+  .car-knob{
+    width:58px; height:58px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #ffffff, #d3d6db 45%, #999fa8 100%);
+    box-shadow: inset 0 0 0 4px var(--housing-2), 0 3px 8px rgba(0,0,0,.35);
+  }
+  .car-screen{
+    flex:1; min-width:0; background:var(--screen-bg); border-radius:var(--radius-sm);
+    padding:14px 18px; display:flex; flex-direction:column; justify-content:center; gap:5px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+  }
+  .car-screen-title{
+    font-family:var(--font-c); color:var(--led); font-size:1rem; letter-spacing:.04em; text-transform:uppercase;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-shadow:0 0 8px rgba(185,143,251,.5);
+  }
+  .car-screen-artist{
+    font-family:var(--font-c); color:var(--led); opacity:.65; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .car-right{ display:flex; flex-direction:column; gap:7px; align-items:center; justify-content:center; flex:none; }
+  .car-eject{
+    background:var(--housing-2); color:var(--ink); border:none; border-radius:999px;
+    width:32px; height:32px; font-size:.8rem; display:flex; align-items:center; justify-content:center; user-select:none;
+  }
+  .car-io{ font-family:var(--font-b); font-size:.58rem; font-weight:700; color:var(--ink-soft); letter-spacing:.06em; user-select:none; }
+
+  .car-presets{ display:flex; gap:7px; flex-wrap:wrap; }
+  .car-preset{
+    flex:1; min-width:36px; background:var(--housing-2); color:var(--ink); border:none; border-radius:999px;
+    padding:9px 0; font-family:var(--font-b); font-weight:700; font-size:.8rem; cursor:pointer;
+    transition: background .12s ease, color .12s ease, transform .1s ease;
+  }
+  .car-preset:hover{ transform:translateY(-1px); }
+  .car-preset.is-active{ background:var(--accent); color:#fff; }
+
+  .car-bottom{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .car-track-group{ display:flex; align-items:center; background:var(--housing-2); border-radius:999px; padding:4px; gap:2px; }
+  .car-track-btn{
+    background:transparent; color:var(--ink); border:none; border-radius:999px;
+    width:36px; height:32px; font-size:.85rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition: background .12s ease, color .12s ease;
+  }
+  .car-track-btn.is-pressed{ background:var(--housing); color:var(--accent); }
+  .car-track-label{ font-family:var(--font-b); font-weight:700; font-size:.64rem; letter-spacing:.1em; color:var(--ink); padding:0 8px; user-select:none; }
+  .car-toggle{
+    background:var(--housing-2); color:var(--ink-soft); border:none; border-radius:999px;
+    padding:8px 14px; font-family:var(--font-b); font-weight:700; font-size:.66rem; letter-spacing:.06em; cursor:pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .car-toggle[aria-pressed="true"]{ background:var(--accent); color:#fff; }
+
   /* ---------- real audio player ---------- */
   .play-row{ display:flex; flex-direction:column; align-items:center; gap:8px; margin:0 0 22px; }
   .player-card{
@@ -334,15 +406,16 @@
 </style>
 
 <div class="page">
-  <p class="eyebrow">One playlist, four machines</p>
+  <p class="eyebrow">One playlist, five machines</p>
   <h1 class="title">JIJI List</h1>
-  <p class="kicker"><bdi><span id="totalKicker">10</span> أغنية وحدة… تسمعينها راديو، آيبود، كاسيت، أو أسطوانة — اختاري الجهاز وشوفي القائمة تتلبّس شكل ثاني.</bdi></p>
+  <p class="kicker"><bdi><span id="totalKicker">10</span> أغنية وحدة… تسمعينها راديو، آيبود، كاسيت، أسطوانة، أو مسجل سيارة — اختاري الجهاز وشوفي القائمة تتلبّس شكل ثاني.</bdi></p>
 
   <div class="switcher" role="group" aria-label="Choose player mode">
     <button type="button" class="mode-btn" data-mode-btn="radio" aria-pressed="false"><span class="ico">📻</span>Radio</button>
     <button type="button" class="mode-btn" data-mode-btn="ipod" aria-pressed="false"><span class="ico">🎧</span>iPod</button>
     <button type="button" class="mode-btn" data-mode-btn="cassette" aria-pressed="false"><span class="ico">📼</span>Tape</button>
     <button type="button" class="mode-btn" data-mode-btn="vinyl" aria-pressed="false"><span class="ico">💿</span>Vinyl</button>
+    <button type="button" class="mode-btn" data-mode-btn="car" aria-pressed="false"><span class="ico">🚗</span>Car</button>
   </div>
 
   <div class="stage">
@@ -425,6 +498,46 @@
         <div class="now-playing-text vinyl-np" data-now-playing>—</div>
       </div>
     </div>
+
+    <!-- CAR STEREO -->
+    <div class="device-visual" data-for="car">
+      <div class="car-body">
+        <div class="car-top">
+          <div class="car-side">
+            <span class="car-side-btn">SRC<span class="sub">- OFF</span></span>
+            <span class="car-side-btn">BAND</span>
+            <span class="car-side-btn">DISP</span>
+          </div>
+          <div class="car-knob-wrap"><div class="car-knob"></div></div>
+          <div class="car-screen">
+            <div class="car-screen-title now-playing-text" data-now-playing>—</div>
+            <div class="car-screen-artist" data-now-playing-artist>—</div>
+          </div>
+          <div class="car-right">
+            <span class="car-eject" aria-hidden="true">⏏</span>
+            <span class="car-io">USB</span>
+            <span class="car-io">AUX</span>
+          </div>
+        </div>
+        <div class="car-presets" role="group" aria-label="Preset tracks">
+          <button type="button" class="car-preset" data-preset="0">1</button>
+          <button type="button" class="car-preset" data-preset="1">2</button>
+          <button type="button" class="car-preset" data-preset="2">3</button>
+          <button type="button" class="car-preset" data-preset="3">4</button>
+          <button type="button" class="car-preset" data-preset="4">5</button>
+          <button type="button" class="car-preset" data-preset="5">6</button>
+        </div>
+        <div class="car-bottom">
+          <div class="car-track-group">
+            <button type="button" class="car-track-btn" data-action="prev" aria-label="Previous track">◄</button>
+            <span class="car-track-label">TRACK</span>
+            <button type="button" class="car-track-btn" data-action="next" aria-label="Next track">►</button>
+          </div>
+          <button type="button" class="car-toggle" id="carRptBtn" data-action="rpt" aria-pressed="false">RPT</button>
+          <button type="button" class="car-toggle" id="carRdmBtn" data-action="rdm" aria-pressed="false">RDM</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="play-row">
@@ -451,7 +564,7 @@
   </div>
 
   <footer class="foot">
-    <p>JIJI list — <span id="totalFooter">10</span> tracks, one playlist, four machines.</p>
+    <p>JIJI list — <span id="totalFooter">10</span> tracks, one playlist, five machines.</p>
     <p class="credits">🎧 كل المقاطع هنا موسيقى Royalty-Free من <a href="https://pixabay.com/music/" target="_blank" rel="noopener">Pixabay</a>، مرخّصة صراحة للاستخدام والنشر العام. Music by The Mountain, Alex Morgan, APALONBeats, BombinSound, penguinmusic, andriig &amp; Tunetank — from Pixabay.</p>
   </footer>
 </div>
@@ -477,10 +590,11 @@
     radio: "ابحثي عن محطة…",
     ipod: "Search your library…",
     cassette: "Find it on the tape…",
-    vinyl: "Browse the crate…"
+    vinyl: "Browse the crate…",
+    car: "دوّري على أغنية…"
   };
 
-  var MODES = ["radio","ipod","cassette","vinyl"];
+  var MODES = ["radio","ipod","cassette","vinyl","car"];
   var root = document.documentElement;
   var trackListEl = document.getElementById("trackList");
   var filterInput = document.getElementById("filterInput");
@@ -490,9 +604,14 @@
   var ipodProgress = document.getElementById("ipodProgress");
   var tapeCounter = document.getElementById("tapeCounter");
   var centerBtn = document.getElementById("centerBtn");
+  var carPresetButtons = Array.prototype.slice.call(document.querySelectorAll(".car-preset"));
+  var carRptBtn = document.getElementById("carRptBtn");
+  var carRdmBtn = document.getElementById("carRdmBtn");
 
   var currentMode = "radio";
   var selectedIndex = 0;
+  var repeatOne = false;
+  var shuffleOn = false;
   var player = document.getElementById("player");
   var playToggle = document.getElementById("playToggle");
   var playIcon = document.getElementById("playIcon");
@@ -670,6 +789,11 @@
     var count = (selectedIndex * 37) % 999;
     tapeCounter.textContent = String(count).padStart(3,"0");
 
+    carPresetButtons.forEach(function(btn){
+      var idx = parseInt(btn.getAttribute("data-preset"),10);
+      btn.classList.toggle("is-active", idx === selectedIndex);
+    });
+
     if(trackCredit){
       trackCredit.textContent = "🎵 \"" + title + "\" — Music by " + artist + " from Pixabay (Royalty-Free)";
     }
@@ -755,7 +879,13 @@
     player.addEventListener("pause", function(){ setPlayingUI(false); });
     player.addEventListener("ended", function(){
       setPlayingUI(false);
-      selectSong((selectedIndex + 1) % SONGS.length, { autoplay:true, scroll:true });
+      var nextIndex;
+      if(shuffleOn && SONGS.length > 1){
+        do{ nextIndex = Math.floor(Math.random() * SONGS.length); }while(nextIndex === selectedIndex);
+      } else {
+        nextIndex = (selectedIndex + 1) % SONGS.length;
+      }
+      selectSong(nextIndex, { autoplay:true, scroll:true });
     });
     player.addEventListener("loadedmetadata", function(){
       timeTotal.textContent = formatTime(player.duration);
@@ -824,7 +954,34 @@
       else if(action === "play"){
         if(playToggle) playToggle.click();
       }
+      else if(action === "rpt"){
+        repeatOne = !repeatOne;
+        if(player) player.loop = repeatOne;
+        el.setAttribute("aria-pressed", repeatOne ? "true" : "false");
+      }
+      else if(action === "rdm"){
+        shuffleOn = !shuffleOn;
+        el.setAttribute("aria-pressed", shuffleOn ? "true" : "false");
+      }
     });
+  });
+
+  /* car stereo: preset buttons jump straight to a track, like real station presets */
+  carPresetButtons.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var idx = parseInt(btn.getAttribute("data-preset"),10);
+      selectSong(idx, { autoplay:true, scroll:true });
+    });
+  });
+
+  /* car stereo: TRACK ◄ ► buttons flash dark the instant they're pressed, back to normal the instant released */
+  document.querySelectorAll(".car-track-btn").forEach(function(btn){
+    var press = function(){ btn.classList.add("is-pressed"); };
+    var release = function(){ btn.classList.remove("is-pressed"); };
+    btn.addEventListener("pointerdown", press);
+    btn.addEventListener("pointerup", release);
+    btn.addEventListener("pointerleave", release);
+    btn.addEventListener("pointercancel", release);
   });
 
   var totalKicker = document.getElementById("totalKicker");
