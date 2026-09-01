@@ -232,13 +232,22 @@
   .tonearm::after{ content:""; position:absolute; bottom:-4px; left:-6px; width:18px; height:10px; background:var(--accent); border-radius:2px; }
   .vinyl-np{ font-family:var(--font-c); font-style:italic; font-size:1.05rem; color:var(--ink); text-align:center; max-width:280px; }
 
-  /* ---------- spotify hook ---------- */
-  .play-row{ display:flex; flex-direction:column; align-items:center; gap:14px; margin:0 0 22px; }
+  /* ---------- playback hook (Spotify + YouTube) ---------- */
+  .play-row{ display:flex; flex-direction:column; align-items:center; gap:12px; margin:0 0 22px; }
+  .source-toggle{ display:flex; gap:8px; }
+  .source-btn{
+    border:1px solid var(--line); background:var(--bg-2); color:var(--ink-soft);
+    padding:7px 16px; border-radius:999px; cursor:pointer; font-size:.75rem; font-weight:700;
+    font-family:var(--font-b); letter-spacing:.03em; transition:background .2s ease,color .2s ease,border-color .2s ease;
+  }
+  .source-btn[aria-pressed="true"]{ background:var(--accent); border-color:var(--accent); color:var(--screen-bg); }
+  html[data-mode="ipod"] .source-btn[aria-pressed="true"]{ color:#fff; }
   .np-embed-card{
     width:100%; background:var(--list-bg); border:1px solid var(--line); border-radius:var(--radius-sm);
     padding:8px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
   }
-  .spotify-frame{ display:block; width:100%; border-radius:12px; }
+  .spotify-frame{ display:block; width:100%; border-radius:12px; height:152px; }
+  .spotify-frame.is-video{ height:auto; aspect-ratio:16/9; }
   .np-embed-fallback{
     margin:6px 4px 2px; font-size:.82rem; color:var(--list-ink-soft); text-align:center; line-height:1.6;
   }
@@ -431,12 +440,16 @@
   </div>
 
   <div class="play-row">
+    <div class="source-toggle" role="group" aria-label="اختاري مصدر التشغيل">
+      <button type="button" class="source-btn" data-source-btn="youtube" aria-pressed="true">▶ YouTube</button>
+      <button type="button" class="source-btn" data-source-btn="spotify" aria-pressed="false">♫ Spotify</button>
+    </div>
     <div class="np-embed-card" id="npEmbedCard">
-      <iframe id="spotifyFrame" class="spotify-frame" title="Spotify player" src="" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" hidden></iframe>
-      <p class="np-embed-fallback" id="npEmbedFallback" hidden>ما لقينا نسخة سبوتيفاي رسمية أقدر أشغّلها هنا داخل الصفحة لهالأغنية — افتحيها من سبوتيفاي مباشرة 👇</p>
+      <iframe id="mediaFrame" class="spotify-frame" title="مشغل الأغنية" src="" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" hidden></iframe>
+      <p class="np-embed-fallback" id="npEmbedFallback" hidden>ما لقينا نسخة رسمية أقدر أشغّلها هنا داخل الصفحة لهالأغنية — افتحيها من الرابط تحت 👇</p>
     </div>
     <a class="spotify-btn" id="spotifyBtn" href="#" target="_blank" rel="noopener">
-      <span class="ico">↗</span><span id="spotifyBtnLabel">Open in Spotify</span>
+      <span class="ico">↗</span><span id="spotifyBtnLabel">Open</span>
     </a>
   </div>
 
@@ -457,17 +470,18 @@
 <script>
 (function(){
   "use strict";
+  /* song format: [title, artist, spotifyTrackId, youtubeVideoId] — either id may be null when no official version was confirmed */
   var SONGS = [
-    ["petal","Ariana Grande","70pVCVMGjmIWPbWXDwf11e"],
-    ["the boy is mine","Ariana Grande","0Lmbke3KNVFXtoH2mMSHCw"],
-    ["Boys Don't Cry","The Cure","1QFh8OH1e78dGd3VyJZCAC"],
-    ["The Boy Is Mine","Brandy, Monica","6sHsXIJoEN5JpdkGMQDJxt"],
-    ["Circus","Britney Spears","7jk7gqyEonmVVYahZN5zhW"],
-    ["Vanished","Crystal Castles","4bQ7mjty0UVlKRalhizpGT"],
-    ["Jealous Type","Doja Cat","1IfGOnXoMBkiKC9xljlSfa"],
-    ["Kiss Me More (feat. SZA)","Doja Cat, SZA","3DarAbFujv6eYNliUTyqtz"],
-    ["Feel Good Inc.","Gorillaz","0d28khcov6AiegSCpG5TuT"],
-    ["Go Away","Unknown Artist",null]
+    ["petal","Ariana Grande","70pVCVMGjmIWPbWXDwf11e","SYmydafMxLQ"],
+    ["the boy is mine","Ariana Grande","0Lmbke3KNVFXtoH2mMSHCw","KwRxeZ9Ro24"],
+    ["Boys Don't Cry","The Cure","1QFh8OH1e78dGd3VyJZCAC","9GkVhgIeGJQ"],
+    ["The Boy Is Mine","Brandy, Monica","6sHsXIJoEN5JpdkGMQDJxt","qSIOp_K5GMw"],
+    ["Circus","Britney Spears","7jk7gqyEonmVVYahZN5zhW","lVhJ_A8XUgc"],
+    ["Vanished","Crystal Castles","4bQ7mjty0UVlKRalhizpGT",null],
+    ["Jealous Type","Doja Cat","1IfGOnXoMBkiKC9xljlSfa","lv1MwS56aCo"],
+    ["Kiss Me More (feat. SZA)","Doja Cat, SZA","3DarAbFujv6eYNliUTyqtz","0EVVKs6DQLo"],
+    ["Feel Good Inc.","Gorillaz","0d28khcov6AiegSCpG5TuT","HyHNuVaZJ-k"],
+    ["Go Away","Unknown Artist",null,null]
   ];
 
   var PLACEHOLDERS = {
@@ -490,6 +504,9 @@
 
   var currentMode = "radio";
   var selectedIndex = 0;
+  var SOURCES = ["youtube","spotify"];
+  var currentSource = "youtube";
+  var sourceButtons = Array.prototype.slice.call(document.querySelectorAll("[data-source-btn]"));
 
   function storage(){
     try{ return window.localStorage; }catch(e){ return null; }
@@ -500,11 +517,13 @@
     try{
       var m = s.getItem("jiji-mode");
       var i = s.getItem("jiji-index");
+      var src = s.getItem("jiji-source");
       if(m && MODES.indexOf(m) !== -1) currentMode = m;
       if(i !== null && !isNaN(parseInt(i,10))){
         var n = parseInt(i,10);
         if(n >= 0 && n < SONGS.length) selectedIndex = n;
       }
+      if(src && SOURCES.indexOf(src) !== -1) currentSource = src;
     }catch(e){}
   }
   function saveState(){
@@ -513,6 +532,7 @@
     try{
       s.setItem("jiji-mode", currentMode);
       s.setItem("jiji-index", String(selectedIndex));
+      s.setItem("jiji-source", currentSource);
     }catch(e){}
   }
 
@@ -533,6 +553,32 @@
   function spotifyEmbedUrl(i){
     var song = SONGS[i];
     return song[2] ? "https://open.spotify.com/embed/track/" + song[2] + "?utm_source=generator&theme=0" : null;
+  }
+  function youtubeUrl(i){
+    var song = SONGS[i];
+    return song[3] ? "https://www.youtube.com/watch?v=" + song[3] : null;
+  }
+  function youtubeEmbedUrl(i){
+    var song = SONGS[i];
+    return song[3] ? "https://www.youtube-nocookie.com/embed/" + song[3] : null;
+  }
+  /* resolves the best available embed for the current source, falling back to the other source */
+  function resolveEmbed(i){
+    var order = currentSource === "youtube" ? ["youtube","spotify"] : ["spotify","youtube"];
+    for(var k=0;k<order.length;k++){
+      var url = order[k] === "youtube" ? youtubeEmbedUrl(i) : spotifyEmbedUrl(i);
+      if(url) return { url: url, source: order[k] };
+    }
+    return null;
+  }
+  /* resolves the best available "open externally" link for the current source, falling back to the other, then to a Spotify search */
+  function resolveOpenUrl(i){
+    var order = currentSource === "youtube" ? ["youtube","spotify"] : ["spotify","youtube"];
+    for(var k=0;k<order.length;k++){
+      var url = order[k] === "youtube" ? youtubeUrl(i) : spotifyTrackUrl(i);
+      if(url) return { url: url, source: order[k] };
+    }
+    return { url: spotifySearchUrl(i), source: "spotify" };
   }
 
   function renderRows(list){
@@ -661,26 +707,29 @@
     var count = (selectedIndex * 37) % 999;
     tapeCounter.textContent = String(count).padStart(3,"0");
 
+    var openLink = resolveOpenUrl(selectedIndex);
     var spotifyBtn = document.getElementById("spotifyBtn");
     var spotifyBtnLabel = document.getElementById("spotifyBtnLabel");
     if(spotifyBtn){
-      spotifyBtn.href = spotifyTrackUrl(selectedIndex);
-      spotifyBtnLabel.textContent = "Open \"" + title + "\" in Spotify";
+      spotifyBtn.href = openLink.url;
+      spotifyBtnLabel.textContent = "Open \"" + title + "\" in " + (openLink.source === "youtube" ? "YouTube" : "Spotify");
     }
 
-    var frame = document.getElementById("spotifyFrame");
+    var frame = document.getElementById("mediaFrame");
     var fallback = document.getElementById("npEmbedFallback");
-    var embedUrl = spotifyEmbedUrl(selectedIndex);
+    var embed = resolveEmbed(selectedIndex);
     if(frame){
-      if(embedUrl){
-        if(frame.getAttribute("data-src") !== embedUrl){
-          frame.src = embedUrl;
-          frame.setAttribute("data-src", embedUrl);
+      if(embed){
+        if(frame.getAttribute("data-src") !== embed.url){
+          frame.src = embed.url;
+          frame.setAttribute("data-src", embed.url);
         }
+        frame.classList.toggle("is-video", embed.source === "youtube");
         frame.hidden = false;
         if(fallback) fallback.hidden = true;
       } else {
         frame.hidden = true;
+        frame.classList.remove("is-video");
         frame.removeAttribute("src");
         frame.removeAttribute("data-src");
         if(fallback) fallback.hidden = false;
@@ -731,6 +780,22 @@
     });
   });
 
+  function syncSourceButtons(){
+    sourceButtons.forEach(function(btn){
+      btn.setAttribute("aria-pressed", btn.getAttribute("data-source-btn") === currentSource ? "true" : "false");
+    });
+  }
+  sourceButtons.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var src = btn.getAttribute("data-source-btn");
+      if(SOURCES.indexOf(src) === -1 || src === currentSource) return;
+      currentSource = src;
+      syncSourceButtons();
+      updateNowPlaying();
+      saveState();
+    });
+  });
+
   trackListEl.addEventListener("click", function(e){
     if(e.target.closest(".row-play")) return;
     var row = e.target.closest(".track-row");
@@ -765,7 +830,7 @@
         if(row){ row.scrollIntoView({ block:"nearest" }); }
       }
       else if(action === "play"){
-        window.open(spotifyTrackUrl(selectedIndex), "_blank", "noopener");
+        window.open(resolveOpenUrl(selectedIndex).url, "_blank", "noopener");
       }
     });
   });
@@ -777,6 +842,7 @@
 
   loadState();
   if(selectedIndex >= SONGS.length) selectedIndex = 0;
+  syncSourceButtons();
   setMode(currentMode);
   selectSong(selectedIndex);
 })();
